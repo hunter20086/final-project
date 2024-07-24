@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Product Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section id="products">
+        <h2>Our Products</h2>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search products by type...">
+        </div>
+        <button id="show-add-product-form-btn">Add New Product</button>
+        <form id="add-product-form" class="hidden">
+            <input type="text" id="product-name" placeholder="Product Name" required>
+            <input type="number" id="product-price" placeholder="Product Price" step="0.01" required>
+            <input type="file" id="product-photo" accept="image/*" required>
+            <input type="text" id="product-type" placeholder="Product Type" required>
+            <input type="text" id="product-place" placeholder="Product Place" required>
+            <button type="submit">Add Product</button>
+        </form>
+        <div id="product-list" class="product-list"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Product Store</p>
+    </footer>
+
+    <script>
+        // Fetch the header HTML
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+                updateTotalPriceInNav(); // Update total price in nav
+                displayProducts(); // Display products after header is loaded
+            });
+
+        // Event listener for search bar input
+        document.getElementById('search-bar').addEventListener('input', function(e) {
+            filterProducts(e.target.value.toLowerCase());
+        });
+
+        // Show the add product form when the button is clicked
+        document.getElementById('show-add-product-form-btn').addEventListener('click', function() {
+            const form = document.getElementById('add-product-form');
+            form.classList.toggle('hidden');
+        });
+
+        // Handle form submission
+        document.getElementById('add-product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('product-name').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const photo = document.getElementById('product-photo').files[0];
+            const type = document.getElementById('product-type').value;
+            const place = document.getElementById('product-place').value;
+
+            if (!name || isNaN(price) || !photo || !type || !place) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const product = {
+                    name: name,
+                    price: price,
+                    photo: reader.result, // Use FileReader result for image URL
+                    type: type,
+                    place: place
+                };
+
+                let products = JSON.parse(localStorage.getItem('products')) || [];
+                products.push(product);
+                localStorage.setItem('products', JSON.stringify(products));
+
+                displayProducts();
+                document.getElementById('add-product-form').classList.add('hidden');
+                document.getElementById('add-product-form').reset();
+            };
+            reader.readAsDataURL(photo); // Convert file to base64 URL
+        });
+
+        // Display products on the page
+        function displayProducts() {
+            const productContainer = document.getElementById('product-list');
+            productContainer.innerHTML = '';
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                    <img src="${product.photo}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>$${product.price.toFixed(2)}</p>
+                    <p>Type: ${product.type}</p>
+                    <p>Place: ${product.place}</p>
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                `;
+                productElement.querySelector('.add-to-cart-btn').addEventListener('click', function() {
+                    addToCart(product);
+                });
+                productContainer.appendChild(productElement);
+            });
+        }
+
+        // Filter products based on search query
+        function filterProducts(query) {
+            const productElements = document.querySelectorAll('#products .product');
+            productElements.forEach(productElement => {
+                const productType = productElement.querySelector('p').textContent.toLowerCase();
+                if (productType.includes(query)) {
+                    productElement.style.display = 'block';
+                } else {
+                    productElement.style.display = 'none';
+                }
+            });
+        }
+
+        // Placeholder function for adding products to the cart
+        function addToCart(product) {
+            // Implement your addToCart logic here
+        }
+
+        // Function to update total price in navigation
+        function updateTotalPriceInNav() {
+            const totalPrice = calculateTotalPrice();
+            document.querySelector('#header .total-price').textContent = `$${totalPrice.toFixed(2)}`;
+        }
+
+        // Function to calculate total price (example implementation)
+        function calculateTotalPrice() {
+            // Implement your calculation logic here
+            return 0; // Placeholder
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
+

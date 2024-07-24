@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section id="home">
+        <h2>Welcome to Our Product Store</h2>
+        <div id="home-products" class="product-list"></div>
+        <p>Discover our amazing products and enjoy your shopping experience!</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Product Store</p>
+    </footer>
+
+    <script>
+        // Fetch the header HTML
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+                displayRandomProducts();
+            });
+
+        // Function to display 5 random products
+        function displayRandomProducts() {
+            const productContainer = document.getElementById('home-products');
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+
+            if (products.length === 0) {
+                productContainer.innerHTML = '<p>No products available.</p>';
+                return;
+            }
+
+            // Shuffle products and get the first 5
+            const shuffled = products.sort(() => 0.5 - Math.random());
+            const selectedProducts = shuffled.slice(0, 5);
+
+            selectedProducts.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                    <img src="${product.photo}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>$${product.price.toFixed(2)}</p>
+                    <p>Type: ${product.type}</p>
+                    <p>Place: ${product.place}</p>
+                    <button data-name="${product.name}" data-price="${product.price}" data-photo="${product.photo}" data-type="${product.type}" data-place="${product.place}">Add to Cart</button>
+                `;
+                productContainer.appendChild(productElement);
+            });
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

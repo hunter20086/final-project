@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Product Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section id="profile">
+        <h2>My Profile</h2>
+        
+        <!-- Profile Display -->
+        <div id="profile-display" class="profile-display">
+            <p id="display-name">Name: </p>
+            <p id="display-email">Email: </p>
+            <p id="display-phone">Phone Number: </p>
+            <button id="edit-profile-btn">Edit Profile</button>
+        </div>
+
+        <!-- Profile Edit Form -->
+        <form id="profile-form" class="hidden">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Your Name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Your Email" required>
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" placeholder="Your Phone Number" required>
+
+            <button type="submit">Save Profile</button>
+            <button type="button" id="cancel-edit-btn">Cancel</button>
+        </form>
+
+        <h3>My Projects</h3>
+        <div id="project-list" class="project-list"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Product Store</p>
+    </footer>
+
+    <script>
+        // Fetch the header HTML
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+                displayProfile();
+                displayProjects();
+            });
+
+        // Display profile information
+        function displayProfile() {
+            const profile = JSON.parse(localStorage.getItem('profile')) || {};
+            
+            document.getElementById('display-name').textContent = `Name: ${profile.name || 'Not provided'}`;
+            document.getElementById('display-email').textContent = `Email: ${profile.email || 'Not provided'}`;
+            document.getElementById('display-phone').textContent = `Phone Number: ${profile.phone || 'Not provided'}`;
+
+            document.getElementById('edit-profile-btn').addEventListener('click', function() {
+                document.getElementById('profile-display').classList.add('hidden');
+                document.getElementById('profile-form').classList.remove('hidden');
+            });
+
+            document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+                document.getElementById('profile-display').classList.remove('hidden');
+                document.getElementById('profile-form').classList.add('hidden');
+            });
+
+            document.getElementById('profile-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+
+                if (!name || !email || !phone) {
+                    alert('Please fill out all fields.');
+                    return;
+                }
+
+                const profileData = { name, email, phone };
+                localStorage.setItem('profile', JSON.stringify(profileData));
+                
+                document.getElementById('display-name').textContent = `Name: ${name}`;
+                document.getElementById('display-email').textContent = `Email: ${email}`;
+                document.getElementById('display-phone').textContent = `Phone Number: ${phone}`;
+
+                document.getElementById('profile-display').classList.remove('hidden');
+                document.getElementById('profile-form').classList.add('hidden');
+            });
+        }
+
+        // Display projects on the profile page
+        function displayProjects() {
+            const projectContainer = document.getElementById('project-list');
+            const projects = JSON.parse(localStorage.getItem('products')) || [];
+            
+            projectContainer.innerHTML = '';
+
+            projects.forEach((project, index) => {
+                const projectElement = document.createElement('div');
+                projectElement.classList.add('project');
+                projectElement.innerHTML = `
+
+                    <img src="${project.photo}" alt="${project.name}">
+                    <h3>${project.name}</h3>
+                    <p>$${project.price.toFixed(2)}</p>
+                    <p>Type: ${project.type}</p>
+                    <p>Place: ${project.place}</p>
+                    <button class="delete-project-btn" data-index="${index}">Delete Project</button>
+                `;
+                projectContainer.appendChild(projectElement);
+            });
+
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-project-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    deleteProject(index);
+                });
+            });
+        }
+
+        // Delete a project
+        function deleteProject(index) {
+            let projects = JSON.parse(localStorage.getItem('products')) || [];
+            projects.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(projects));
+            displayProjects(); // Refresh the project list
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

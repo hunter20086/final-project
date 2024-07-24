@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - Product Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section id="cart">
+        <h2>My Cart</h2>
+        <div class="cart-items"></div>
+        <div class="total">Total: <span id="total-price">$0.00</span></div>
+        <button id="buy-btn">Buy</button>
+    </section>
+
+    <section id="bought-items">
+        <h2>Bought Items</h2>
+        <div class="bought-items-list"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Product Store</p>
+    </footer>
+
+    <!-- Modal Popup -->
+    <div id="buy-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Buy Items</h2>
+            <form id="buy-form">
+                <label for="payment-method">Payment Method:</label>
+                <select id="payment-method" required>
+                    <option value="paypal">PayPal</option>
+                    <option value="cash">Cash</option>
+                    <option value="credit-card">Credit Card</option>
+                </select>
+                <label for="country">Country:</label>
+                <select id="country" required>
+                    <!-- Country options will be populated by JavaScript -->
+                </select>
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" required>
+                <button type="submit">Confirm</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header').innerHTML = data;
+            });
+
+        const countries = [
+            "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina",
+            "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+            "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana",
+            "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon",
+            "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo",
+            "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica",
+            "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia",
+            "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana",
+            "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
+            "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan",
+            "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea (North)", "Korea (South)", "Kuwait", "Kyrgyzstan",
+            "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+            "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania",
+            "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco",
+            "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua",
+            "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama",
+            "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
+            "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa",
+            "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+            "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain",
+            "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania",
+            "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan",
+            "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay",
+            "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItemsContainer = document.querySelector('.cart-items');
+            const boughtItemsContainer = document.querySelector('.bought-items-list');
+            const buyButton = document.getElementById('buy-btn');
+            const buyModal = document.getElementById('buy-modal');
+            const closeModalButton = document.querySelector('.close-btn');
+            const buyForm = document.getElementById('buy-form');
+            const totalElement = document.getElementById('total-price');
+            const countrySelect = document.getElementById('country');
+
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let boughtItems = JSON.parse(localStorage.getItem('boughtItems')) || [];
+
+            function updateCart() {
+                cartItemsContainer.innerHTML = '';
+                let totalPrice = 0;
+
+                cart.forEach(item => {
+                    totalPrice += item.price;
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('cart-item');
+                    itemElement.innerHTML = `
+                        <img src="${item.photo}" alt="${item.name}">
+                        <h3  class='title-remove' >${item.name}</h3>
+                        <p>$${item.price.toFixed(2)}</p>
+                        <p>Type: ${item.type}</p>
+                        <p>Place: ${item.place}</p>
+                        <button class="remove-item-btn" data-name="${item.name}">Remove</button>
+                    `;
+                    cartItemsContainer.appendChild(itemElement);
+                });
+
+                totalElement.textContent = `$${totalPrice.toFixed(2)}`;
+                updateTotalInNav(totalPrice);
+
+                document.querySelectorAll('.remove-item-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemName = this.getAttribute('data-name');
+                        removeFromCart(itemName);
+                    });
+                });
+            }
+
+            function updateTotalInNav(totalPrice) {
+                const totalNavElement = document.querySelector('.total-price');
+                totalNavElement.textContent = `$${totalPrice.toFixed(2)}`;
+            }
+
+            function removeFromCart(itemName) {
+                cart = cart.filter(item => item.name !== itemName);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCart();
+            }
+
+            function updateBoughtItems() {
+                boughtItemsContainer.innerHTML = '';
+
+                boughtItems.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('bought-item');
+                    itemElement.innerHTML = `
+                        <img src="${item.photo}" alt="${item.name}">
+                        <h3>${item.name}</h3>
+                        <p>$${item.price.toFixed(2)}</p>
+                        <p>Type: ${item.type}</p>
+                        <p>Place: ${item.place}</p>
+                    `;
+                    boughtItemsContainer.appendChild(itemElement);
+                });
+            }
+
+            buyButton.addEventListener('click', () => {
+                buyModal.classList.remove('hidden');
+            });
+
+            closeModalButton.addEventListener('click', () => {
+                buyModal.classList.add('hidden');
+            });
+
+            buyForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const paymentMethod = document.getElementById('payment-method').value;
+                const country = document.getElementById('country').value;
+                const phone = document.getElementById('phone').value;
+
+                const confirmation = confirm(`Confirm purchase with ${paymentMethod} in ${country}?`);
+                if (confirmation) {
+                    boughtItems = [...boughtItems, ...cart];
+                    localStorage.setItem('boughtItems', JSON.stringify(boughtItems));
+                    cart = [];
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCart();
+                    updateBoughtItems();
+                    buyModal.classList.add('hidden');
+                    alert('Purchase successful!');
+                }
+            });
+
+           
+        });
+    </script>
+    <script src="script.js">
+        updateCart();
+            updateBoughtItems();
+    </script>
+</body>
+</html>
+

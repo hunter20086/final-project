@@ -1,0 +1,267 @@
+/* General styles */
+body {
+    background-image: url('/backround.jpg');
+    background-size: cover; /* Ensure background covers the entire viewport */
+    background-repeat: no-repeat;
+    font-family: Arial, sans-serif;
+    font-size: 16px; /* Increased font size for better readability */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f4f4f4;
+}
+
+h1, h2, h3 {
+    color: #333;
+    text-align: center;
+}
+
+p {
+    color: #555;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* Navigation styles */
+nav {
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px; /* Adjusted padding for better spacing */
+    width: 100%;
+}
+
+nav .nav-left {
+    flex-grow: 1;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li {
+    margin-right: 15px; /* Adjusted margin for menu items */
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+}
+
+/* Section styles */
+section {
+    padding: 30px; /* Increased padding for sections */
+    margin: 20px auto;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Product styles */
+.product {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    background-color: #fff;
+    width: 220px; /* Increased width for better content spacing */
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.product img {
+    width: 100%;
+    height: 200px;
+}
+
+.product h3 {
+    margin: 10px 0;
+}
+
+.product p {
+    color: #555;
+}
+
+.product button {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 12px 20px; /* Increased padding for buttons */
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.product button:hover {
+    background-color: #555;
+}
+
+/* Product list container for flex display */
+.product-list {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap to the next line */
+    justify-content: center; /* Centers the products */
+    gap: 20px; /* Space between products */
+}
+
+/* Ensure the products have a fixed width */
+.product {
+    flex: 0 0 220px; /* Flex-grow: 0, flex-shrink: 0, flex-basis: 220px */
+    margin: 10px; /* Margin for spacing */
+    box-sizing: border-box; /* Ensures padding and border are included in the width and height */
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Form styles */
+input[type="text"],
+input[type="number"],
+textarea {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+}
+.cart-item{
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 5px;
+}
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .product {
+        width: 100%; /* Adjust product width for smaller screens */
+    }
+}
+
+/* Additional styles for search container */
+.search-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+#search-bar {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+}
+
+/* Ensure the products container has sufficient padding for the search bar */
+#products {
+    position: relative;
+    padding-top: 50px; /* Space for the search bar */
+}
+
+/* Hide elements initially */
+.hidden {
+    display: none;
+}
+/* Modal Styling */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.close-btn {
+    float: right;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+#buy-form label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+#buy-form input,
+#buy-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#buy-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#buy-form button:hover {
+    background-color: #0056b3;
+}
+
+
+.title-remove{
+    width: 160px;
+}
